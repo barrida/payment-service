@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  payment-producer:
+    build: ./payment-producer
+    container_name: payment-producer
+    ports:
+      - "8081:8080"
+    networks:
+      - payment-network
+    depends_on:
+      - validation-service
+      - processing-service
+
+  validation-service:
+    build: ./validation-service
+    container_name: validation-service
+    ports:
+      - "8082:8080"
+    networks:
+      - payment-network
+    depends_on:
+      - processing-service
+
+  processing-service:
+    build: ./processing-service
+    container_name: processing-service
+    ports:
+      - "8083:8080"
+    networks:
+      - payment-network
+    depends_on:
+      - confirmation-service
+
+  confirmation-service:
+    build: ./confirmation-service
+    container_name: confirmation-service
+    ports:
+      - "8084:8080"
+    networks:
+      - payment-network
+    depends_on:
+      - audit-service
+
+  audit-service:
+    build: ./audit-service
+    container_name: audit-service
+    ports:
+      - "8085:8080"
+    networks:
+      - payment-network
+
+networks:
+  payment-network:
+    driver: bridge
